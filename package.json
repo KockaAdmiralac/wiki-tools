@@ -1,0 +1,31 @@
+{
+    "name": "wiki-tools",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "node --loader ts-node/esm index.ts"
+    },
+    "keywords": [
+        "mediawiki",
+        "discord"
+    ],
+    "author": {
+        "email": "git@kocka.tech",
+        "name": "Luka Simić",
+        "url": "https://kocka.tech"
+    },
+    "license": "MIT",
+    "description": "Various wiki tools for various purposes.",
+    "dependencies": {
+        "ajv": "8.16.0",
+        "cli-progress": "3.12.0",
+        "discord.js": "14.15.3",
+        "mwn": "2.0.3"
+    },
+    "devDependencies": {
+        "@types/cli-progress": "3.11.5",
+        "@types/node": "20.14.9",
+        "ts-node": "10.9.2",
+        "typescript": "5.5.3"
+    },
+    "type": "module"
+}
