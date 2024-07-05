@@ -6,6 +6,9 @@ import scripts from './scripts/index.js';
 const schema: JSONSchemaType<Config> = {
     type: 'object',
     properties: {
+        configName: {
+            type: 'string'
+        },
         baseUrl: {
             type: 'string',
             pattern: '^https?://.*$'
@@ -65,9 +68,12 @@ const schema: JSONSchemaType<Config> = {
     additionalProperties: false
 };
 
-async function readConfigFile(filePath: string): Promise<Config> {
+async function readConfigFile(configName: string): Promise<Config> {
     try {
-        const config = await readJSON(filePath);
+        const config = {
+            ...await readJSON(`config/${configName}.json`),
+            configName
+        };
         const ajv = new Ajv();
         const validate = ajv.compile(schema);
         if (!validate(config)) {
@@ -81,12 +87,12 @@ async function readConfigFile(filePath: string): Promise<Config> {
 
 async function main() {
     const scriptName = argv[2];
-    const configPath = argv[3];
-    if (!scriptName || !configPath) {
+    const configName = argv[3];
+    if (!scriptName || !configName) {
         console.error('Script name and configuration path required.');
         exit(1);
     }
-    const config = await readConfigFile(configPath);
+    const config = await readConfigFile(configName);
     if (!scripts[scriptName]) {
         console.error(`Unknown script: '${scriptName}'.`)
         exit(1);

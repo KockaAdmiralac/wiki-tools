@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'fs/promises';
 
 export interface Config {
+    configName: string;
     baseUrl: string;
     articlePath: string;
     scriptPath: string;
