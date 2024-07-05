@@ -7,10 +7,9 @@ import { InterwikiMap } from '../lib/interwiki-util.js';
 
 export async function main(config: Config) {
     const rl = createInterface({
-        input: process.stdin,
-        output: process.stdout,
+        input: process.stdin as any,
+        output: process.stdout as any,
     });
-    console.log('wtf');
     const interwiki: InterwikiMap = await readJSONOrDefault('interwiki.json', {});
     const langCode = await rl.question('Enter the language code (e.g., pt-br): ');
     const enBot = new Mwn({
