@@ -37,7 +37,9 @@ export async function main(config: Config, args: string[]) {
     for (const [page, translations] of Object.entries(interwikiData)) {
         try {
             await bot.edit(page, ({content}) => {
-                const noInterlang = content.replace(/\n\[\[[a-z\-]+:[^\]]+\]\]/g, '');
+                const noInterlang = content
+                    .replace(/^\[\[[a-z\-]+:[^\]]+\]\]$/gm, '')
+                    .trim();
                 const newInterlanguageLinks = Object.entries(translations)
                     .map(([lang, title]) => `[[${lang}:${title}]]`)
                     .join('\n');
