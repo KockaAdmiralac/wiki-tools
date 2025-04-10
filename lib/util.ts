@@ -22,7 +22,8 @@ export async function readJSON(fileName: string): Promise<any> {
 
 export async function readDataFile(wikiId: string, fileName: string, fallback: any) {
     try {
-        return await readJSON(`data/${wikiId}/${fileName}.json`);
+        const dataDir = process.env.WIKI_TOOLS_DATA_DIR || 'data';
+        return await readJSON(`${dataDir}/${wikiId}/${fileName}.json`);
     } catch (error: any) {
         if (error && error.code === 'ENOENT') {
             return fallback;
@@ -43,7 +44,8 @@ export function getPageUrl(config: Config, page: string, language: string = 'en'
 }
 
 export async function writeDataFile(wikiId: string, fileName: string, json: any) {
-    const dir = `data/${wikiId}`;
+    const dataDir = process.env.WIKI_TOOLS_DATA_DIR || 'data';
+    const dir = `${dataDir}/${wikiId}`;
     await mkdir(dir, {
         recursive: true
     });

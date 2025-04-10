@@ -70,8 +70,9 @@ const schema: JSONSchemaType<Config> = {
 
 async function readConfigFile(wikiId: string): Promise<Config> {
     try {
+        const configDir = process.env.WIKI_TOOLS_CONFIG_DIR || 'config';
         const config = {
-            ...await readJSON(`config/${wikiId}.json`),
+            ...await readJSON(`${configDir}/${wikiId}.json`),
             wikiId
         };
         const ajv = new Ajv();
