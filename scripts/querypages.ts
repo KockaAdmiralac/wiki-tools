@@ -28,7 +28,27 @@ async function fetchQueryPage(bot: Mwn, qppage: string): Promise<string[]> {
 async function fetchQueryPages(bot: Mwn, querypages: string[]): Promise<QueryPageMap> {
     const result: QueryPageMap = {};
     for (const querypage of querypages) {
+        if (querypage === 'LintErrors') {
+            continue;
+        }
         result[querypage] = await fetchQueryPage(bot, querypage);
+    }
+    return result;
+}
+
+async function fetchLintErrors(bot: Mwn): Promise<QueryPageMap> {
+    const responses: any[] = await bot.continuedQuery({
+        action: 'query',
+        list: 'linterrors',
+        lntlimit: 'max'
+    });
+    const result: QueryPageMap = {};
+    for (const response of responses) {
+        for (const {title, category} of response?.query?.linterrors || []) {
+            const formattedCategory = `LintErrors/${category}`;
+            result[formattedCategory] = result[formattedCategory] || [];
+            result[formattedCategory].push(title);
+        }
     }
     return result;
 }
@@ -40,7 +60,10 @@ export async function main(config: Config) {
         userAgent: 'MediaWiki link checker'
     });
     const queryPages = await fetchQueryPages(bot, config.querypages);
-    const diff = await getDiffAndUpdate('querypages.json', queryPages, compareStringMaps);
+    const lintErrorsEnabled = config.querypages.includes('LintErrors');
+    const lintErrors = lintErrorsEnabled ? await fetchLintErrors(bot) : {};
+    const queryLintPages = {...queryPages, ...lintErrors};
+    const diff = await getDiffAndUpdate('querypages.json', queryLintPages, compareStringMaps);
     await sendToDiscord<string>({
         addedTitle: page => `New reports on ${page}`,
         removedTitle: page => `Resolved reports on ${page}`,
