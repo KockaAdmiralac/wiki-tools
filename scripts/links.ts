@@ -162,7 +162,7 @@ export async function main(config: Config) {
     const errors = await checkExternalLinks(externalLinksMap);
     const sortedErrors = sortErrors(errors);
     const retriedErrors = await retryErrors(sortedErrors);
-    const diff = await getDiffAndUpdate('errors.json', retriedErrors, compareMaps('link'));
+    const diff = await getDiffAndUpdate(config.wikiId, 'link-errors', retriedErrors, compareMaps('link'));
     const pageToMdLink = (p: string) => `[${p}](<${getPageUrl(config, p)}>)`;
     await sendToDiscord({
         addedTitle: type => `New ${type} link errors`,

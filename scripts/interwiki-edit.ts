@@ -1,6 +1,6 @@
 import { Mwn } from 'mwn';
 import { InterwikiMap } from '../lib/interwiki-util.js';
-import { Config, getApiUrl, readJSONOrDefault } from '../lib/util.js';
+import { Config, getApiUrl, readDataFile } from '../lib/util.js';
 
 function transformInterwikiData(data: InterwikiMap, language: string): InterwikiMap {
     if (language === 'en') {
@@ -26,7 +26,11 @@ function transformInterwikiData(data: InterwikiMap, language: string): Interwiki
 
 export async function main(config: Config, args: string[]) {
     const targetLanguage = args[0] || 'en';
-    const interwikiData = transformInterwikiData(await readJSONOrDefault('interwiki.json', {}), targetLanguage);
+    const interwikiData = transformInterwikiData(await readDataFile(
+        config.wikiId,
+        'interwiki',
+        {}
+    ), targetLanguage);
     const bot = new Mwn({
         apiUrl: getApiUrl(config, targetLanguage),
         username: config.username,

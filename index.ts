@@ -6,7 +6,7 @@ import scripts from './scripts/index.js';
 const schema: JSONSchemaType<Config> = {
     type: 'object',
     properties: {
-        configName: {
+        wikiId: {
             type: 'string'
         },
         baseUrl: {
@@ -68,11 +68,11 @@ const schema: JSONSchemaType<Config> = {
     additionalProperties: false
 };
 
-async function readConfigFile(configName: string): Promise<Config> {
+async function readConfigFile(wikiId: string): Promise<Config> {
     try {
         const config = {
-            ...await readJSON(`config/${configName}.json`),
-            configName
+            ...await readJSON(`config/${wikiId}.json`),
+            wikiId
         };
         const ajv = new Ajv();
         const validate = ajv.compile(schema);
@@ -87,12 +87,12 @@ async function readConfigFile(configName: string): Promise<Config> {
 
 async function main() {
     const scriptName = argv[2];
-    const configName = argv[3];
-    if (!scriptName || !configName) {
+    const wikiId = argv[3];
+    if (!scriptName || !wikiId) {
         console.error('Script name and configuration path required.');
         exit(1);
     }
-    const config = await readConfigFile(configName);
+    const config = await readConfigFile(wikiId);
     if (!scripts[scriptName]) {
         console.error(`Unknown script: '${scriptName}'.`)
         exit(1);

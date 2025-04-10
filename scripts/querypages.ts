@@ -63,7 +63,7 @@ export async function main(config: Config) {
     const lintErrorsEnabled = config.querypages.includes('LintErrors');
     const lintErrors = lintErrorsEnabled ? await fetchLintErrors(bot) : {};
     const queryLintPages = {...queryPages, ...lintErrors};
-    const diff = await getDiffAndUpdate('querypages.json', queryLintPages, compareStringMaps);
+    const diff = await getDiffAndUpdate(config.wikiId, 'querypages', queryLintPages, compareStringMaps);
     await sendToDiscord<string>({
         addedTitle: page => `New reports on ${page}`,
         removedTitle: page => `Resolved reports on ${page}`,

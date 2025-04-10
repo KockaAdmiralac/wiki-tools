@@ -1,8 +1,8 @@
 import {WebhookClient} from 'discord.js';
 import {
     Config,
-    readJSONOrDefault,
-    writeJSON
+    readDataFile,
+    writeDataFile
 } from './util.js';
 
 export interface Diff<T> {
@@ -29,10 +29,10 @@ function truncateList<T>(items: T[], formatItem: (item: T) => string) {
     return pickedItems.join('\n');
 }
 
-export async function getDiffAndUpdate<T, K>(fileName: string, current: T, differ: (current: T, previous: T) => CategorizedDiff<K>) {
-    const previous = await readJSONOrDefault(fileName, {});
+export async function getDiffAndUpdate<T, K>(wikiId: string, fileName: string, current: T, differ: (current: T, previous: T) => CategorizedDiff<K>) {
+    const previous = await readDataFile(wikiId, fileName, {});
     const diff = differ(previous, current);
-    await writeJSON(fileName, current);
+    await writeDataFile(wikiId, fileName, current);
     return diff;
 }
 

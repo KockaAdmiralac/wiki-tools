@@ -1,7 +1,7 @@
-import { readFile, writeFile } from 'fs/promises';
+import { mkdir, readFile, writeFile } from 'fs/promises';
 
 export interface Config {
-    configName: string;
+    wikiId: string;
     baseUrl: string;
     articlePath: string;
     scriptPath: string;
@@ -20,9 +20,9 @@ export async function readJSON(fileName: string): Promise<any> {
     return JSON.parse(json);
 }
 
-export async function readJSONOrDefault(fileName: string, fallback: any) {
+export async function readDataFile(wikiId: string, fileName: string, fallback: any) {
     try {
-        return await readJSON(fileName);
+        return await readJSON(`data/${wikiId}/${fileName}.json`);
     } catch (error: any) {
         if (error && error.code === 'ENOENT') {
             return fallback;
@@ -42,7 +42,11 @@ export function getPageUrl(config: Config, page: string, language: string = 'en'
     return `${config.baseUrl}${config.articlePath}/${encodeURIComponent(page)}`;
 }
 
-export async function writeJSON(fileName: string, json: any) {
+export async function writeDataFile(wikiId: string, fileName: string, json: any) {
+    const dir = `data/${wikiId}`;
+    await mkdir(dir, {
+        recursive: true
+    });
     const jsonString = JSON.stringify(json, null, 4);
-    await writeFile(fileName, jsonString);   
+    await writeFile(`${dir}/${fileName}.json`, jsonString);   
 }

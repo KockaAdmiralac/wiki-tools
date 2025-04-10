@@ -1,7 +1,6 @@
-import { writeFile } from 'fs/promises';
 import { createInterface } from 'readline/promises';
 import { Mwn } from 'mwn';
-import { Config, getApiUrl, readJSONOrDefault } from '../lib/util.js';
+import { Config, getApiUrl, readDataFile, writeDataFile } from '../lib/util.js';
 import { getAllPageTitles } from '../lib/mediawiki.js';
 import { InterwikiMap } from '../lib/interwiki-util.js';
 
@@ -10,7 +9,7 @@ export async function main(config: Config) {
         input: process.stdin as any,
         output: process.stdout as any,
     });
-    const interwiki: InterwikiMap = await readJSONOrDefault('interwiki.json', {});
+    const interwiki: InterwikiMap = await readDataFile(config.wikiId, 'interwiki', {});
     const langCode = await rl.question('Enter the language code (e.g., pt-br): ');
     const enBot = new Mwn({
         apiUrl: getApiUrl(config),
@@ -57,6 +56,6 @@ export async function main(config: Config) {
             }
         }
     }
-    await writeFile('interwiki.json', JSON.stringify(interwiki, null, 4));
+    await writeDataFile(config.wikiId, 'interwiki', interwiki);
     rl.close();
 }
