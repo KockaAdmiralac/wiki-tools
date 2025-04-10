@@ -19,7 +19,7 @@ function truncateList<T>(items: T[], formatItem: (item: T) => string) {
     const pickedItems = [];
     let messageLength = 0;
     for (const item of formattedItems) {
-        if (messageLength + item.length + 1 > 1900) {
+        if (messageLength + item.length + 1 > 4000) {
             pickedItems.push('- …');
             break;
         }
@@ -82,27 +82,43 @@ interface DiscordSendOptions<T> {
     formatItem: (item: T) => string
 }
 
+function embedCharCount(embed: any): number {
+    return embed.title.length + embed.description.length;
+}
+
 export async function sendToDiscord<T>({config, diff, addedTitle, removedTitle, formatItem}: DiscordSendOptions<T>) {
     const allEmbeds = [];
     for (const [category, {added, removed}] of Object.entries(diff)) {
         if (added.length > 0) {
             allEmbeds.push({
-                title: addedTitle(category),
+                title: addedTitle(category).slice(0, 256),
                 color: 0xFF0000,
                 description: truncateList(added, formatItem)
             });
         }
         if (removed.length > 0) {
             allEmbeds.push({
-                title: removedTitle(category),
+                title: removedTitle(category).slice(0, 256),
                 color: 0x00FF00,
                 description: truncateList(removed, formatItem)
             });
         }
     }
     const webhook = new WebhookClient(config.webhook);
+    let totalCharacterCount = 0;
+    let embeds: any[] = [];
     while (allEmbeds.length > 0) {
-        const embeds = allEmbeds.splice(0, 10);
+        const embed = allEmbeds.shift();
+        const charCount = embedCharCount(embed);
+        if (embeds.length >= 10 || totalCharacterCount + charCount > 6000) {
+            await webhook.send({embeds});
+            embeds = [];
+            totalCharacterCount = 0;
+        }
+        embeds.push(embed);
+        totalCharacterCount += charCount;
+    }
+    if (embeds.length > 0) {
         await webhook.send({embeds});
     }
     webhook.destroy();
